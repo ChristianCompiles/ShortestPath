@@ -65,7 +65,7 @@ public:
 	void addNode(TYPE item);
 	/**
 	* Function to get the count of nodes in the graph
-	* @return int the number of nodes in the grap
+	* @return int the number of nodes in the graph
 	*/
 	int getNodeCount();
 	/**
