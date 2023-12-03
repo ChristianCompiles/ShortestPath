@@ -114,7 +114,7 @@ public:
 	/**
 	* Helper function to print the adjacency matrix
 	*/
-	void printAdjacencyMatrix() { printMatrix(adjacencyMatrix, nodes.size()); }
+	void printAdjacencyMatrix() { printMatrix(adjacencyMatrix, (int)nodes.size()); }
 };
 template <typename TYPE>
 GraphMatrix<TYPE>::GraphMatrix()
