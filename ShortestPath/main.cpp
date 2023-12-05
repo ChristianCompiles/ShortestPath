@@ -155,56 +155,5 @@ int main()
 		cout << vecNodes[i].label << ":" << vecNodes[i].weight << "(" << vecNodes[i].prevNode << "), ";
 	}
 
-
-	//// first distance is always 0
-	//cout << startNode << ": " << g.getLink(startNode, startNode) << "(" << startNode << "), " << endl;
-	////cout << "index of c " << g.getNodeIndex('c') << std::endl;
-	//int* SPmatrix = new int[matrixSize * matrixSize]; // hold shortest path matrix
-	//int nodeIndex;
-
-	//for (int i = 0; i < matrixSize * matrixSize; i++) // initialize values to -2
-	//{
-	//	SPmatrix[i] = -2; // initialization value
-	//}
-
-	//for (int j = 0; j < matrixSize; j++) // place values in first row
-	//{
-	//	SPmatrix[j] = g.getLink(startNode, header[j]); // [0][j]
-	//}
-	//signalNodeVisited(SPmatrix, 0, g.getNodeIndex(startNode), matrixSize);
-
-	//printSPmatrix(SPmatrix, matrixSize); // check results of matrix so far
-	////int row = 0;
-	////cout << "smallest value at row " << row << getSmallestWeightAtRow(SPmatrix, row, g.getNodeIndex(startNode), matrixSize) << endl;
-
-	//int nodeToVisit = getSmallestWeightAtRow(SPmatrix, 0, g.getNodeIndex(startNode), matrixSize);
-	//cout << nodeToVisit << endl;
-
-	//for (int i = 1; i < header.size(); i++) // traverse all rows after first row of SPmatrix
-	//{
-	//	for (int j = 0; j < header.size(); j++)
-	//	{
-	//		if (SPmatrix[j + header.size() * i] == -1) // make sure its not in a visited col
-	//			continue;
-	//		if (SPmatrix[j + header.size() * i] == -2) // if that connection has not been seen yet
-	//			SPmatrix[j + header.size() * i] = g.getLink(header[nodeToVisit], header[j]);
-	//		if (g.getLink(header[nodeToVisit], header[j]) + < SPmatrix[j - 1 + header.size() * i]) // 
-
-	//	}
-	//	cout << "\n";
-	//	//nodeIndex = g.getNodeIndex(startNode);
-
-
-	//}
-
-	//fill in first row of SPmatrix with values from adjacency matrix
-	// fill in all rows in the col where node visits itself 
-
-
-
-
-
-
-
 	return 0;
 }
