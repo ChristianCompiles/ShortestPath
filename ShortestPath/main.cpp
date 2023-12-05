@@ -1,13 +1,14 @@
 #include "graph_matrix.h"
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 struct charNode
 {
-	char label;
+	char label = 0;
 	int visted = 0;
-	char prevNode;
-	int weight;
+	char prevNode = 0;
+	int weight = -1;
 
 };
 string setupMatrix(GraphMatrix<char>& g, string inputGraphFileName)
@@ -53,28 +54,14 @@ string setupMatrix(GraphMatrix<char>& g, string inputGraphFileName)
 	fs.close();
 	return header;
 }
-
-void signalNodeVisited(int* ptr, int lastRow, int lastCol, int matrixSize) // set rows to -1 to signal that node been visited
-{
-	for (int i = lastRow + 1; i < matrixSize; i++) // iterate over rows of col
-	{
-		ptr[lastCol + matrixSize * i] = -1; // [i][const col]
-	}
-}
-
-void changeAllValues(int* ptr, int matrixSize)
-{
-	for (int i = 0; i < matrixSize * matrixSize; i++)
-	{
-		ptr[i] = -4;
-	}
-}
 int getSmallestWeightVect(vector<charNode>& vecNodes)
 {
 	int smallest;
 	int i = 0;
-	while (vecNodes[i].weight <= 0 && !vecNodes[i].visted && i < vecNodes.size())
+	while (i < vecNodes.size())
 	{
+		if (vecNodes[i].weight > 0 && !vecNodes[i].visted)
+			break; 
 		i++;
 	}
 	if (i == vecNodes.size() - 1)
@@ -87,48 +74,7 @@ int getSmallestWeightVect(vector<charNode>& vecNodes)
 	}
 	return smallest;
 }
-int getSmallestWeightAtRow(int* SPmatrix, int row, int colVisiting, int sizeMatrix)
-{
-	int smallest;
-	int col = 0;
-	while (SPmatrix[col + sizeMatrix * row] <= 0 && col < sizeMatrix) // get past negative values of row
-	{
-		col++;
-	}
 
-	if (col == sizeMatrix - 1) // if col is 1 less than size, then we are at end of row
-	{
-		return col; // could return weight if needed SPmatrix[col + sizeMatrix * row];
-	}
-
-	smallest = SPmatrix[col + sizeMatrix * row]; // initialize smallest to value at col
-
-	for (int j = col + 1; j < sizeMatrix; j++)
-	{
-		if (SPmatrix[j + sizeMatrix * row] > 0 && SPmatrix[j + sizeMatrix * row] < smallest)
-		{
-			if (j == colVisiting)
-			{
-				continue; // skip column that is node we are visiting
-			}
-			//smallest = SPmatrix[j + sizeMatrix * row];
-			col = j;
-		}
-	}
-	return col;
-}
-
-void printSPmatrix(int* ptr, int matrixSize)
-{
-	for (int i = 0; i < matrixSize; i++)
-	{
-		for (int j = 0; j < matrixSize; j++)
-		{
-			cout << ptr[j + matrixSize * i] << " "; // [i][j]
-		}
-		cout << endl;
-	}
-}
 int main()
 {
 	GraphMatrix<char> g;
@@ -162,33 +108,43 @@ int main()
 			cout << "Start node: " << startNode << " not in graph\n";
 		}
 	}
-	// set start node to visited
+	// first row initialization
 	for (int i = 0; i < vecNodes.size(); i++)
 	{
 		if (vecNodes[i].label == startNode)
 		{
-			vecNodes[i].visted = 1;
-			break;
+			vecNodes[i].visted = 1;// set start node to visited
+			vecNodes[i].weight = 0;
+			continue;
 		}	
+		if (g.getLink(startNode, vecNodes[i].label) != 0) // if link exists between start node and other node
+		{
+			vecNodes[i].weight = g.getLink(startNode, vecNodes[i].label);
+		}
 	}
 
-	int smallest = getSmallestWeightVect(vecNodes);
+	int smallest = getSmallestWeightVect(vecNodes); // find the smallest non-startNode node
 	vecNodes[smallest].visted = 1;
 
 	for (int i = 0; i < vecNodes.size(); i++) // iterate over rows 1 through end
 	{
 		for (int j = 0; j < vecNodes.size(); j++) // iterate over all cols
 		{
-			if (vecNodes[j].visted) // if visited, skip past it
+			if (vecNodes[j].visted) // if node visited, skip past it
 				continue;
-			if (g.getLink(header[smallest], vecNodes[j].label) != 0)
+			if (g.getLink(header[smallest], vecNodes[j].label) != 0) // check for link between visted and node to visit
 			{
-				if (vecNodes[j].weight == 0)
-					vecNodes[j].weight = g.getLink(header[smallest], vecNodes[j].label) + vecNodes[j].weight;
-				else if (g.getLink(header[smallest], vecNodes[j].label) + vecNodes[j].weight < vecNodes[smallest].weight)
-					vecNodes[smallest].weight = g.getLink(header[smallest], vecNodes[j].label) + vecNodes[j].weight;
-			
-				
+				if (vecNodes[j].weight == -1) // if the node has no path to it yet
+				{
+					vecNodes[j].weight = g.getLink(header[smallest], vecNodes[j].label) + vecNodes[smallest].weight;
+					vecNodes[j].prevNode = header[smallest];
+				}
+					
+				else if (g.getLink(header[smallest], vecNodes[j].label) + vecNodes[smallest].weight < vecNodes[j].weight)
+				{
+					vecNodes[j].weight = g.getLink(header[smallest], vecNodes[j].label) + vecNodes[smallest].weight;
+					vecNodes[j].prevNode = header[smallest];
+				}
 			}
 		}
 		smallest = getSmallestWeightVect(vecNodes);
@@ -196,7 +152,7 @@ int main()
 
 	for (int i = 0; i < vecNodes.size(); i++)
 	{
-		cout << vecNodes[i].label << vecNodes[i].weight << "(" << vecNodes[i].prevNode << "), ";
+		cout << vecNodes[i].label << ":" << vecNodes[i].weight << "(" << vecNodes[i].prevNode << "), ";
 	}
 
 
