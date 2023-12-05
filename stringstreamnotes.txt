@@ -1,0 +1,16 @@
+stringstream ss;
+
+this->ss << getInput();
+
+// extract first character from command 
+// (should be single letter that is seperated by rest of text by space)
+this->ss >> letter;
+
+std::dec 
+
+this->ss.str(""); // set stringstream to empty string)
+this->ss.clear(); // reset any flags in stringstream
+
+int main(int argc, char* argv[])
+
+std::string argvOne = argv[1];
