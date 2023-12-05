@@ -9,7 +9,6 @@ struct charNode
 	int visted = 0;
 	char prevNode = 0;
 	int weight = -1;
-
 };
 string setupMatrix(GraphMatrix<char>& g, string inputGraphFileName)
 {
