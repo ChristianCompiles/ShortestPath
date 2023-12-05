@@ -12,72 +12,98 @@ struct charNode
 };
 string setupMatrix(GraphMatrix<char>& g, string inputGraphFileName)
 {
+	// setupMatrix sets up adjacency matrix
 	std::fstream fs;
-	string header;
+	stringstream ss;
+	string headerString;
 	fs.open(inputGraphFileName, std::ios::in);
 
-	if (fs.is_open())
+	if (!fs.is_open()) // if file couldn't open
 	{
-		getline(fs, header);
+		cout << "Error opening " << inputGraphFileName << endl;
+		return "";
+	}
+	// file was opened
+	getline(fs, headerString); // get header of graphInput.txt
 
-		string line;
-		int sizeGraph = (int)header.size();
-		// add nodes to graph
-		for (int i = 0; i < sizeGraph; i++)
-		{
-			g.addNode(header[i]);
-		}
-		int tmp = 0;
-		for (int i = 0; i < sizeGraph; i++) // iterate over rows of matrix
-		{
-			getline(fs, line);
-			int lineIndex = 0;
+	string line;
+	int sizeGraph = (int)headerString.size();
+	
+	// add nodes to graph
+	for (int i = 0; i < sizeGraph; i++)
+	{
+		g.addNode(headerString[i]);
+	}
 
-			if (line.size() - (line.size() - 1) > sizeGraph) // more columns than expected
+	int colCount = 0;
+	int tmpNum = 0;
+	for (int i = 0; i < sizeGraph; i++) // iterate over rows of matrix
+	{
+		getline(fs, line); // place next line of file into string "line"
+		ss << line; // place string "line" into stringstream
+
+		while (ss >> tmpNum)
+		{
+			if(colCount == headerString.size())
 			{
 				cout << "Too many columns in " << line << endl;
 				return {};
 			}
-			for (int j = 0; j < sizeGraph; j++)
-			{
-				tmp = line[lineIndex] - '0'; // convert the char to int
-				g.addLink(header[i], header[j], tmp); // add char to graph
-				lineIndex += 2; // move forward by 2 to account for spaces between numbers
-			}
+			//tmpNum -= '0'; // convert the char to int
+			g.addLink(headerString[i], headerString[colCount], tmpNum); // add char to graph
+			colCount++; // keep track of how wide this row is
 		}
-	}
-	else
-	{
-		cout << "Error opening " << inputGraphFileName << endl;;
+		colCount = 0;
+		ss.str(""); // set stringstream to empty string)
+		ss.clear(); // reset any flags in stringstream
 	}
 	fs.close();
-	return header;
+	return headerString;
 }
 int getSmallestWeightVect(vector<charNode>& vecNodes)
 {
-	int smallest;
-	int i = 0;
+	int smallestValue; // the smallest value we have come across so far
+	int i = 0; // index through vector
+	int colPosSmallestValue; // the col position of the smallest value we have come across so far
+
 	while (i < vecNodes.size())
 	{
-		if (vecNodes[i].weight > 0 && !vecNodes[i].visted)
-			break; 
+		if (vecNodes[i].weight > 0 && !vecNodes[i].visted) // if weight above 0 (not INF), and not visited, 
+			break;										   // then i is the col of the first smallest weight
 		i++;
 	}
-	if (i == vecNodes.size() - 1)
+
+	if (i == vecNodes.size() - 1) // if i is at the last col of the adjacency matrix, return that col position
 		return i;
-	smallest = i;
-	for (int j = i; j < vecNodes.size(); j++)
+
+	smallestValue = vecNodes[i].weight; // initialize smallestWeight to first weighted, unvisted node's weight
+	colPosSmallestValue = i;            // intialize col index to index of first weighted, unvisited node's weight
+
+	while(i < vecNodes.size()) // loop over remaining length of nodes
 	{
-		if (vecNodes[i].weight < smallest)
-			smallest = i;
+		if (vecNodes[i].weight < smallestValue)
+		{
+			smallestValue = vecNodes[i].weight;
+			colPosSmallestValue = i;
+		}
+		i++;
 	}
-	return smallest;
+
+	return colPosSmallestValue;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+	if (argc < 2)
+	{
+		cout << "Must provide input file\n";
+		return 0;
+	}
+
+	string fileToRead = argv[1];
+
 	GraphMatrix<char> g;
-	string header = setupMatrix(g, "graphInput.txt"); // pass object and file to set up matrix with
+	string header = setupMatrix(g, fileToRead); // pass object and file to set up matrix with
 	int matrixSize = header.size();
 	g.printAdjacencyMatrix();
 	vector<charNode> vecNodes;
